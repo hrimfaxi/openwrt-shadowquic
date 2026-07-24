@@ -1,0 +1,41 @@
+# ShadowQUIC 客户端配置示例
+# 将此文件复制到 /etc/shadowquic/ 并根据实际情况修改
+#
+# 支持运行多个实例，只需在 /etc/config/shadowquic 中添加多个 instance 段，
+# 每个实例使用不同的配置文件和监听端口即可。
+# 例如 brutal.yaml 可用于配置另一组 BRUTAL 拥塞控制的出站。
+
+# 入站代理设置
+inbound:
+    # 代理类型: mixed (同时支持 HTTP 和 SOCKS5)
+    type: mixed
+    # 监听地址和端口
+    bind-addr: "127.0.0.1:20808"
+
+# 出站代理设置
+outbound:
+    # 代理类型: shadowquic
+    type: shadowquic
+    # 服务器地址和端口
+    addr: "your-server.example.com:1443"
+    # 认证用户名
+    username: "your-username"
+    # 认证密码
+    password: "your-password"
+    # TLS SNI 伪装域名，需与服务端 jls_upstream 配置一致
+    server-name: "cloudflare.com"
+    # ALPN 协议列表
+    alpn: ["h3"]
+    # QUIC 初始 MTU
+    initial-mtu: 1000
+    # 拥塞控制算法: bbr / cubic / new_reno
+    congestion-control: bbr
+    # 启用 0-RTT 连接
+    zero-rtt: true
+    # true: UDP over QUIC stream, false: UDP over QUIC datagram
+    over-stream: false
+    # 是否启用 GSO (Generic Segmentation Offload)，需内核支持
+    gso: false
+
+# 日志级别: trace / debug / info / warn / error
+log-level: "info"

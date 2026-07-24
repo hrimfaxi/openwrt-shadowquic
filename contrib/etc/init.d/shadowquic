@@ -1,0 +1,51 @@
+#!/bin/sh /etc/rc.common
+
+USE_PROCD=1
+START=95
+STOP=15
+
+BIN="/usr/bin/shadowquic"
+CAP_FILE="/etc/capabilities/shadowquic.json"
+
+start_instance() {
+    local section="$1"
+
+    config_get enabled "$section" enabled 0
+    [ "$enabled" = "1" ] || return 0
+
+    config_get cfg "$section" config
+    [ -f "$cfg" ] || return 1
+
+    procd_open_instance "$section"
+    procd_set_param limits nofile="1024768 1024768"
+    procd_set_param command "$BIN" -c "$cfg"
+    procd_set_param respawn 3600 5 0
+    procd_set_param stdout 1
+    procd_set_param stderr 1
+
+    # ujail hardening: nobody + CAP_NET_ADMIN, ronly + requirejail
+    if [ -x /sbin/ujail -a -e "$CAP_FILE" ]; then
+        procd_add_jail shadowquic log ronly requirejail
+        procd_set_param capabilities "$CAP_FILE"
+        procd_set_param user nobody
+        procd_set_param group nobody
+        procd_set_param no_new_privs 1
+
+        # Config and network-related read-only mounts
+        procd_add_jail_mount "$cfg"
+        procd_add_jail_mount /etc/resolv.conf /etc/hosts /etc/TZ
+    fi
+
+    procd_close_instance
+}
+
+start_service() {
+    [ -x "$BIN" ] || return 1
+
+    config_load shadowquic
+    config_foreach start_instance instance
+}
+
+service_triggers() {
+    procd_add_reload_trigger "shadowquic"
+}
