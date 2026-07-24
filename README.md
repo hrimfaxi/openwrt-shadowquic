@@ -12,25 +12,19 @@ A 0-RTT QUIC proxy with SNI camouflage — UDP friendly, full cone NAT support, 
 
 ## 编译步骤
 
-### 1. 添加 feed
+### 1. 克隆到 package 目录
 
-在 OpenWrt SDK 根目录下，将本仓库添加为自定义 feed：
+在 OpenWrt SDK 根目录下，将本仓库克隆到 `package/` 目录：
 
 ```bash
-# 编辑 feeds.conf.default，追加一行（根据实际路径调整）
-echo 'src-git shadowquic https://github.com/hrimfaxi/openwrt-shadowquic.git' >> feeds.conf.default
-
-# 更新并安装 feed
-./scripts/feeds update shadowquic
-./scripts/feeds install shadowquic
+cd openwrt-sdk-*
+git clone https://github.com/hrimfaxi/openwrt-shadowquic.git package/shadowquic
 ```
 
 如果使用本地仓库：
 
 ```bash
-echo "src-link shadowquic /path/to/openwrt-shadowquic" >> feeds.conf.default
-./scripts/feeds update shadowquic
-./scripts/feeds install shadowquic
+ln -s /path/to/openwrt-shadowquic package/shadowquic
 ```
 
 ### 2. 选择包
