@@ -64,7 +64,6 @@ define Build/Compile
 	CARGO_TARGET_DIR=$(PKG_BUILD_DIR)/target \
 	TARGET_CC=$(TARGET_CC) \
 	TARGET_CXX=$(TARGET_CXX) \
-	TARGET_AR=$(TARGET_AR) \
 	$(CARGO_TARGET_ENV)=$(TARGET_CC) \
 	cargo build --release --target $(RUST_TARGET)
 endef
